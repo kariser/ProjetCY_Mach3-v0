@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <ctype.h>
+#include <time.h>
+#include <windows.h>
 
 #define maxGridSize 26
 #define EMPTY_CELL ' '
@@ -29,6 +31,7 @@ Cell board[maxGridSize][maxGridSize];
 
 
 int score =0;
+
 int validsSwaps =0;
 
 
@@ -442,12 +445,44 @@ void removeMatches()
  
 
     }
+
+    int getNumCol(char  lettreCol)
+    {
+         int numCol ;
+         lettreCol =toupper(lettreCol)-'A';
+         numCol=lettreCol;
+         numCol++;
+         return numCol;
+    }
  
 
 int main() {
+
+      /* 130 = é
+          133 = à
+          138 = è
+          135 = ç
+          136 = ê  */
+
+
+         
+    time_t startTime;
+    char bufferStartTime[80];
+
+    time(&startTime);
+
+    struct tm *pStartTime = localtime( &startTime );
+    strftime( bufferStartTime, 80, "%d/%m/%Y %H:%M:%S", pStartTime );
+    printf( "Date and french time : %s\n", bufferStartTime );
+
+  //  printf("\nThis program has been writeen at (date and time): %s", ctime(&startTime));
+
+   
+
+
     
     int row1, col1, row2, col2;
-    
+    char   letterCol1, letterCol2;
    
       
          printf("Indiquer Nombre de lignes et colonnes de la matrice : ");
@@ -464,17 +499,16 @@ int main() {
     while (hasMatchingCells()) 
      { 
         
-        printf("Select a cell to swap (ligne colonne) : ");
-        scanf("%d %d", &row1, &col1);
-        
-         col1 =col1-'A';
-         printf("Select %d %d", &row1, &col1);  
+       
+        printf("S%clectionnez une cellule %c changer (ligne colonne) : ",130,133);
+        scanf("%d %c", &row1, &letterCol1);
+        col1=getNumCol(letterCol1);
+        printf("Select %d %d\n", row1, col1);  
 
-        printf("Sélectionnez une autre cellule à changer (ligne colonne) : ");
-        scanf("%d %d", &row2, &col2);
-
-        col2 =col2-'A';
-         printf("Select %d %d", &row2, &col2);  
+        printf("S%clectionnez une autre cellule %c changer (ligne colonne) : ",130,133);
+        scanf("%d %c", &row2, &letterCol2);
+        col2=getNumCol(letterCol2);
+        printf("Select %d %d\n", row2, col2);  
 
 
 
@@ -498,7 +532,22 @@ int main() {
              }
    
     }
-    printf("ExistMatchingCells  : %d\n",hasMatchingCells());
+
+  
+
+  
+   time_t endTime; 
+    char bufferEndTime[80];
+
+     time(&endTime);
+
+    struct tm *pEndTime = localtime( &endTime );
+    strftime( bufferEndTime, 80, "%d/%m/%Y %H:%M:%S", pEndTime );
+    printf( "Date and french time : %s\n", bufferEndTime );
+
+    int  seconds=difftime(endTime,startTime);
+  printf("Temps en secondes  : %d\n",seconds);
+    
 
     printf("Jeu terminé. Aucun mouvement possible.\n");
 
