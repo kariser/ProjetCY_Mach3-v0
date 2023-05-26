@@ -473,7 +473,7 @@ int main() {
 
     struct tm *pStartTime = localtime( &startTime );
     strftime( bufferStartTime, 80, "%d/%m/%Y %H:%M:%S", pStartTime );
-    printf( "Date and french time : %s\n", bufferStartTime );
+    printf( "Heure de d%cbut : %s\n",130, bufferStartTime );
 
   //  printf("\nThis program has been writeen at (date and time): %s", ctime(&startTime));
 
@@ -484,12 +484,43 @@ int main() {
     int row1, col1, row2, col2;
     char   letterCol1, letterCol2;
    
-      
-         printf("Indiquer Nombre de lignes et colonnes de la matrice : ");
-        scanf("%d %d", &pGridLines, &pGridColumns);
+          int  attenteValeurs =1;
 
-        printf("Indiquer le nombre de symboles (4 à 6) : ");
-        scanf("%d", &pNumberOfSymbols);
+         printf("Indiquer Nombre de lignes et colonnes de la matrice (Exemple : 10 8) : ");
+         while (attenteValeurs)
+            {
+                
+                scanf("%d %d", &pGridLines, &pGridColumns);
+                if( pGridLines>=8 && pGridLines<=26 && pGridColumns>=8 && pGridColumns<=26  )
+                            attenteValeurs=0;
+                else {      
+                            printf("%s", COLOR_RED);
+                            printf("le nombre de lignes doit %ctre entre 8 et 26\n",136);
+                            printf("le nombre de colonnes doit %ctre %cgalement 8 et 26\n",136,130);
+                              printf("%s ", COLOR_RESET);
+                            printf("Merci d'indiquer le nombre de lignes et colonnes de la matrice (Exemple : 8 8) : ");
+                   }
+
+            }
+
+            attenteValeurs =1;
+
+            printf("Indiquer le nombre de symboles (4 %c 6) : ",133);
+            while (attenteValeurs)
+                {
+
+                   
+                    scanf("%d", &pNumberOfSymbols);
+
+                    if( pNumberOfSymbols>=4 && pNumberOfSymbols<=6   )
+                                attenteValeurs=0;
+                    else {     
+                                 printf("%s", COLOR_RED);
+                                printf("Le nombre de symboles doit %ctre entre 4 et 6\n",136);
+                                 printf("%s ", COLOR_RESET);
+                                printf("Merci d'indiquer le nombre de symboles (4 %c 6) : ",133);
+                            }
+                }
 
         fillBoard();
     
@@ -499,16 +530,55 @@ int main() {
     while (hasMatchingCells()) 
      { 
         
-       
-        printf("S%clectionnez une cellule %c changer (ligne colonne) : ",130,133);
-        scanf("%d %c", &row1, &letterCol1);
-        col1=getNumCol(letterCol1);
-        printf("Select %d %d\n", row1, col1);  
+         attenteValeurs =1;
 
-        printf("S%clectionnez une autre cellule %c changer (ligne colonne) : ",130,133);
-        scanf("%d %c", &row2, &letterCol2);
-        col2=getNumCol(letterCol2);
-        printf("Select %d %d\n", row2, col2);  
+          printf("S%clectionnez une cellule %c changer (ligne colonne) : ",130,133);
+         while (attenteValeurs)
+            {
+
+               
+                scanf("%d %c", &row1, &letterCol1);
+                col1=getNumCol(letterCol1);
+                        if( row1>=1 &&  row1 <= pGridLines  && col1>= 1 &&  col1 <= pGridColumns  )
+                                attenteValeurs=0;
+                         else {
+                                 printf("%s", COLOR_RED);
+                                printf("Le num%cro de la ligne doit %ctre un nombre entre 1 et %d\n",130,136, pGridLines);
+                                printf("La colone doit %ctre indiqu%ce par une lettre de A %c %C\n",136,130,133, 'A' + pGridColumns-1);
+                                   printf("%s", COLOR_RESET);
+                                printf("Merci d'indiquer une cellule %c changer (ligne colonne) : " ,133);
+                            }
+
+
+              
+            }
+
+
+
+         attenteValeurs =1;
+  
+         printf("S%clectionnez une autre cellule %c changer (ligne colonne) : ",130,133);
+            {
+
+               
+               scanf("%d %c", &row2, &letterCol2);
+               col2=getNumCol(letterCol2);
+                        if( row2>=1 &&  row2 <= pGridLines  && col2>= 1 &&  col2 <= pGridColumns  )
+                                attenteValeurs=0;
+                         else {
+                                printf("%s ", COLOR_RED);
+                                printf("Le num%cro de la ligne doit %ctre un nombre entre 1 et %d\n",130,136, pGridLines);
+                                printf("La colone doit %ctre indiqu%ce par une lettre de A %c %C\n",136,130,133, 'A' + pGridColumns-1);
+                                printf("%s ", COLOR_RESET);
+                                printf("Merci d'indiquer une cellule %c changer (ligne colonne) : " ,133);
+                            }
+     
+            }
+
+        
+        
+       
+      
 
 
 
@@ -521,14 +591,16 @@ int main() {
                 
                while   (markMatches())  {   removeMatches();  }
 
-              printf("Matrice apres suppresion\n");                     
+              printf("Matrice apr%cs suppresion\n",138);                     
               printBoard();   
 
                printf("Score : %d en %d Mouvements\n", score,validsSwaps);                           
 
          }
         else {
-            printf("Mouvement invalide. Veuillez reessayer.\n");
+                    printf("%s ", COLOR_RED);
+                    printf("Mouvement invalide. Veuillez r%cessayer.\n",130);
+                    printf("%s ", COLOR_RESET);
              }
    
     }
@@ -543,13 +615,13 @@ int main() {
 
     struct tm *pEndTime = localtime( &endTime );
     strftime( bufferEndTime, 80, "%d/%m/%Y %H:%M:%S", pEndTime );
-    printf( "Date and french time : %s\n", bufferEndTime );
+    printf( "Heure de fin : %s\n",130, bufferEndTime );
 
     int  seconds=difftime(endTime,startTime);
   printf("Temps en secondes  : %d\n",seconds);
     
 
-    printf("Jeu terminé. Aucun mouvement possible.\n");
+    printf("Jeu termin%c. Aucun mouvement possible.\n",130);
 
     return 0;
 }
