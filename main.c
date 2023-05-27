@@ -833,7 +833,7 @@ int main() {
     struct tm *pEndTime = localtime( &endTime );
     strftime( bufferEndTime, 80, "%d/%m/%Y %H:%M:%S", pEndTime );
  
-    printf("%sJeu termin%c. Aucun mouvement possible. R%csultat : %s\n",COLOR_BLUE,130,130,COLOR_RESET);
+    printf("%sJeu termin%c. Aucun mouvement possible. R%sultat : %s\n",COLOR_BLUE,130,130,COLOR_RESET);
     printf("%s---------------------------------------------------%s\n",COLOR_BLUE, COLOR_RESET);
     printf("%sScore finale : %d en %d Mouvements%s\n",COLOR_BLUE, score,validsSwaps,COLOR_RESET);    
      //  Affiche heure début et heure fin de la partie
