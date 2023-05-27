@@ -7,8 +7,20 @@
 #include <time.h>
 #include <windows.h>
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+
+#define minGridSize 8
 #define maxGridSize 26
+
+
+#define minSymbols 4
+#define maxSymbols 6
+
 #define EMPTY_CELL ' '
+#define BUFFER_SIZE 4096
 
 // Structure représentant une cellule du plateau
 typedef struct {
@@ -454,17 +466,105 @@ void removeMatches()
          numCol++;
          return numCol;
     }
+
+     int getNumber(char  lettreCol)
+    {
+         int numCol ;
+         lettreCol =toupper(lettreCol)-'0';
+         numCol=lettreCol;
+         numCol++;
+         return numCol;
+    }
  
+ bool parse_int(char *string, int *integer)
+{
+  // i will keep our current index into the string as we loop through it 
+  // one character at a time
+  int i = 0;
+  
+  // move through any leading whitespace
+  while (isspace(string[i])) i++;
+  
+  // get the length of the string
+  int length = strlen(string);
+  
+  // if the entire string was just whitespace characters ("a blank string") 
+  // we'll have reached the end of the string and we can return false as the 
+  // string did not contain an integer
+  if (length == i) return false;
+  
+  // the integer chars will be stored into integer_buffer, we'll use 
+  // integer_chars to keep track of our index into this buffer as we store 
+  // each character
+  char integer_buffer[BUFFER_SIZE];
+  int integer_chars = 0;
+  
+  // in the case of a negative integer, the first char may be - symbol
+  if (string[i] == '-')
+  {
+    // store the symbol into the buffer, and advance both indexes into the 
+    // string and buffer
+    integer_buffer[integer_chars] = '-';
+    integer_chars++;
+    i++;
+    
+    // if the - character is not followed by a digit, the string does not 
+    // contain a valid integer
+    if (!isdigit(string[i])) return false;
+  }
+  
+  // loop through characters until we reach the end of the string or a trailing
+  // whitespace character
+  while (i < length && !isspace(string[i]))
+  {
+    // if we encounter anything that is not a digit, we do not have a valid int 
+    // in the string
+    if (!isdigit(string[i])) return false;
+    
+    // store the next character into the buffer, advance both indexes
+    integer_buffer[integer_chars] = string[i];
+    integer_chars++;
+    i++;
+  }
+  
+  // put a null terminator onto the end of the buffer to make it a proper string
+  integer_buffer[integer_chars] = '\0';
+  
+  // loop through any trailing whitespace characters
+  while (isspace(string[i])) i++;
+  
+  // if after doing so, we are NOT at the end of the string, then the string 
+  // does not contain a valid integer
+  if (string[i] != '\0') return false;
+  
+  // atoi converts the string representation of our integer to an int type 
+  // value in C, and we de-reference integer to "return" the value via a pointer
+  *integer = atoi(integer_buffer);
+  
+  // we've successfully validated the presence of an int and so can return true
+  return true;
+  
 
-int main() {
+}
 
-      /* 130 = é
+
+int clean_stdin()
+{
+    while (getchar() != '\n');
+    return 1;
+}
+
+ /* 130 = é
           133 = à
           138 = è
           135 = ç
           136 = ê  */
 
 
+
+int main() {
+
+     
          
     time_t startTime;
     char bufferStartTime[80];
@@ -481,46 +581,110 @@ int main() {
 
 
     
-    int row1, col1, row2, col2;
-    char   letterCol1, letterCol2;
-   
-          int  attenteValeurs =1;
+    int row1, col1, row2, col2,  first_time_around ;
+    char   letterCol1, letterCol2,charEndLine ;
+    char buffer1, buffer2;
+    bool parsed_correct ;
 
-         printf("Indiquer Nombre de lignes et colonnes de la matrice (Exemple : 10 8) : ");
-         while (attenteValeurs)
-            {
-                
-                scanf("%d %d", &pGridLines, &pGridColumns);
-                if( pGridLines>=8 && pGridLines<=26 && pGridColumns>=8 && pGridColumns<=26  )
-                            attenteValeurs=0;
-                else {      
-                            printf("%s", COLOR_RED);
-                            printf("le nombre de lignes doit %ctre entre 8 et 26\n",136);
-                            printf("le nombre de colonnes doit %ctre %cgalement 8 et 26\n",136,130);
-                              printf("%s ", COLOR_RESET);
-                            printf("Merci d'indiquer le nombre de lignes et colonnes de la matrice (Exemple : 8 8) : ");
-                   }
 
-            }
 
-            attenteValeurs =1;
+    
+      parsed_correct = true;
+  
+  // Demander à l'utilisateur le nombre de lignes de la matrice jusqu'à ce qu'il répond avec un entier compris entre minGridSize (8 default) et maxGridSize (26 default)
+  do
+  {
+    // Demander à l'utilisateur le nombre de lignes de la matrice
+    printf("Indiquer Nombre de lignes de la matrice : ");
+    
+    //  fget permet de récupéer  la ligne de texte saisie par l'utilisateur et la stocker au niveau de la variable buffer
+    char buffer[BUFFER_SIZE];
+    fgets(buffer, BUFFER_SIZE, stdin);
+    
+    // Valider la valeur saisie par l'utilisateur  et la stocker au niveau de pGridLines
+    // Il retourne true si la valeur est un entier et false si la valeur saisie ne correspond pas à un entier.
+    parsed_correct = parse_int(buffer, &pGridLines);
+    
+    
+    // Contrôle spécifique à nombre de ligne d'une matrice qui doit être compris entre minGridSize (8 default) et maxGridSize (26 default)
+         
+    if (parsed_correct && pGridLines >=minGridSize && pGridLines<=maxGridSize) parsed_correct= true;
+      else parsed_correct=false;
 
-            printf("Indiquer le nombre de symboles (4 %c 6) : ",133);
-            while (attenteValeurs)
-                {
+        if (!parsed_correct)    printf("%sLe nombre de lignes doit %ctre un entier entre %d et %d%s\n",COLOR_RED,136,minGridSize,maxGridSize,COLOR_RESET);
+        
+   // Après la saisie d'un nombre entier valide, on sort de la boucle
 
-                   
-                    scanf("%d", &pNumberOfSymbols);
+  } while (!parsed_correct);
 
-                    if( pNumberOfSymbols>=4 && pNumberOfSymbols<=6   )
-                                attenteValeurs=0;
-                    else {     
-                                 printf("%s", COLOR_RED);
-                                printf("Le nombre de symboles doit %ctre entre 4 et 6\n",136);
-                                 printf("%s ", COLOR_RESET);
-                                printf("Merci d'indiquer le nombre de symboles (4 %c 6) : ",133);
-                            }
-                }
+  // printf("Nombre de colonnes de la matrice : %d\n", pGridLines);
+  
+
+
+
+      parsed_correct = true;
+  
+  // Demander à l'utilisateur le nombre de colonnes de la matrice jusqu'à ce qu'il répond avec un entier compris entre minGridSize (8 default) et maxGridSize (26 default)
+  do
+  {
+    // Demander à l'utilisateur le nombre de clonnes de la matrice
+    printf("Indiquer le nombre de colonnes de la matrice : ");
+    
+    //  fget per de récupéer  la ligne de texte saisie par l'utilisateur et la stocker au niveau de la variable buffer
+    char buffer[BUFFER_SIZE];
+    fgets(buffer, BUFFER_SIZE, stdin);
+    
+    // Valider la valeur saisie par l'utilisateur  et la stocke au niveau de pGridColumns
+    // Il retourne true si la valeur est un entier et false si la valeur saisie ne correspond pas à un entier.
+    parsed_correct = parse_int(buffer, &pGridColumns);
+    
+    
+    // Contrôle spécifique à nombre de ligne d'une matrice qui doit être compris entre minGridSize (8 default) et maxGridSize (26 default)
+         
+    if (parsed_correct && pGridColumns >=minGridSize && pGridColumns<=maxGridSize) parsed_correct= true;
+      else parsed_correct=false;
+
+        if (!parsed_correct)    printf("%sLe nombre de lignes doit %ctre un entier entre %d et %d%s\n",COLOR_RED,136,minGridSize,maxGridSize,COLOR_RESET);
+        
+   // Après la saisie d'un nombre entier valide, on sort de la boucle
+
+  } while (!parsed_correct);
+
+ //   printf("Nombre de colonnes de la matrice : %d\n", pGridColumns);
+
+
+
+   parsed_correct = true;
+  
+  // Demander à l'utilisateur le nombre de symboles à utiliser dans la matrice jusqu'à ce qu'il répond avec un entier compris entre minSymbols (4 default) et maxSymbols (6 default)
+        do
+        {
+                    // Demander à l'utilisateur le nombre de symboles de la matrice
+                    printf("Indiquer Nombre de symboles %c utiliser dans la matrice : ", 133);
+                    
+                    //  fget permet de récupérer  la ligne de texte saisie par l'utilisateur et la stocker au niveau de la variable buffer
+                    char buffer[BUFFER_SIZE];
+                    fgets(buffer, BUFFER_SIZE, stdin);
+                    
+                    // Valider la valeur saisie par l'utilisateur  et la stocker au niveau de pNumberOfSymbols
+                    // Il retourne true si la valeur est un entier et false si la valeur saisie ne correspond pas à un entier.
+                    parsed_correct = parse_int(buffer, &pNumberOfSymbols);
+                    
+                    
+                    // Contrôle spécifique à nombre de symboles qui doit être compris entre minSymbols (4 default) et maxSymbols (6 default)
+                        
+                    if   (parsed_correct && pNumberOfSymbols >=minSymbols && pNumberOfSymbols<=maxSymbols) parsed_correct= true;
+                    else parsed_correct=false;
+
+                    if (!parsed_correct)  printf("%sLe nombre de symbole doit %ctre un entier entre %d et %d%s\n",COLOR_RED,136,minSymbols,maxSymbols,COLOR_RESET);
+                        
+                // Après la saisie d'un nombre entier valide, on sort de la boucle
+
+        } while (!parsed_correct);
+
+  //  printf("Nombre de symboles de la matrice : %d\n", pNumberOfSymbols);
+
+ 
 
         fillBoard();
     
@@ -530,61 +694,134 @@ int main() {
     while (hasMatchingCells()) 
      { 
         
-         attenteValeurs =1;
-
-          printf("S%clectionnez une cellule %c changer (ligne colonne) : ",130,133);
-         while (attenteValeurs)
-            {
-
-               
-                scanf("%d %c", &row1, &letterCol1);
-                col1=getNumCol(letterCol1);
-                        if( row1>=1 &&  row1 <= pGridLines  && col1>= 1 &&  col1 <= pGridColumns  )
-                                attenteValeurs=0;
-                         else {
-                                 printf("%s", COLOR_RED);
-                                printf("Le num%cro de la ligne doit %ctre un nombre entre 1 et %d\n",130,136, pGridLines);
-                                printf("La colone doit %ctre indiqu%ce par une lettre de A %c %C\n",136,130,133, 'A' + pGridColumns-1);
-                                   printf("%s", COLOR_RESET);
-                                printf("Merci d'indiquer une cellule %c changer (ligne colonne) : " ,133);
-                            }
-
-
-              
-            }
 
 
 
-         attenteValeurs =1;
+
+
+
+   parsed_correct = true;
   
-         printf("S%clectionnez une autre cellule %c changer (ligne colonne) : ",130,133);
-            {
 
-               
-               scanf("%d %c", &row2, &letterCol2);
-               col2=getNumCol(letterCol2);
-                        if( row2>=1 &&  row2 <= pGridLines  && col2>= 1 &&  col2 <= pGridColumns  )
-                                attenteValeurs=0;
-                         else {
-                                printf("%s ", COLOR_RED);
-                                printf("Le num%cro de la ligne doit %ctre un nombre entre 1 et %d\n",130,136, pGridLines);
-                                printf("La colone doit %ctre indiqu%ce par une lettre de A %c %C\n",136,130,133, 'A' + pGridColumns-1);
-                                printf("%s ", COLOR_RESET);
-                                printf("Merci d'indiquer une cellule %c changer (ligne colonne) : " ,133);
-                            }
-     
-            }
+  // Demander à l'utilisateur le numéro de la ligne de la clulle jusqu'à ce qu'il répond avec un entier compris entre 1 et pGridLines (valeur saisie avant par l'utilisateur)
+  do
+  {
+    // Demander à l'utilisateur le numéro de la ligne de la cellule
+    printf("Indiquer le num%cro de la ligne de la premi%cre cellule %c changer : ",130,138,133);
+    
+    //  fget permet de récupérer  la ligne de texte saisie par l'utilisateur et la stocker au niveau de la variable buffer
+    char buffer[BUFFER_SIZE];
+    fgets(buffer, BUFFER_SIZE, stdin);
+    
+    // Valider la valeur saisie par l'utilisateur  et la stocker au niveau de row1
+    // Il retourne true si la valeur est un entier et false si la valeur saisie ne correspond pas à un entier.
+    parsed_correct = parse_int(buffer, &row1);
+    
+    
+    // Contrôle spécifique au numéro de la ligne qui doit être compris entre 1 et  pGridLines
+         
+    if   (parsed_correct && row1 >=1 && row1<=pGridLines) parsed_correct= true;
+    else parsed_correct=false;
 
+    if (!parsed_correct)  printf("%sLe nombre de symbole doit %ctre un entier entre 1 et %d%s\n",COLOR_RED,136,pGridLines,COLOR_RESET);
         
-        
+   // Après la saisie d'un nombre entier valide, on sort de la boucle
+
+  } while (!parsed_correct);
+
+  //  printf("Numero ligne de la matrice : %d\n", row1);
+
+ 
+
+
+  first_time_around = 0;
+ 
+    do
+    {  
+         
+        if (first_time_around == 0)
+            first_time_around++;
+        else
+              printf("%sLa colone doit %ctre indiqu%ce par une lettre de A %c %c%s\n",COLOR_RED,136,130,133, letters[pGridColumns-1],COLOR_RESET);
+
+        printf("Indiquer le code de la colonne de la premi%cre cellule: ",138);
+
+    }  while (      (   ( scanf("%c%c", &letterCol1, &charEndLine) != 2 || charEndLine != '\n' )  && clean_stdin() )
+                          || !isalpha(letterCol1) 
+                          || ( isalpha(letterCol1) && ( toupper(letterCol1) <'A'  || toupper(letterCol1) > letters[pGridColumns-1] ) )
+                    );
+ col1=getNumCol(letterCol1);
+  
+  //  printf("Numero colonne de la matrice : %c  %d\n", letterCol1,col1); 
+ 
        
       
+// deuxieme cellule
+
+
+   parsed_correct = true;
+  
+
+  // Demander à l'utilisateur le numéro de la lignes de la cellule jusqu'à ce qu'il répond avec un entier compre entre 1 et  pGridLines
+  do
+  {
+    // Demander à l'utilisateur le numéro de la ligne de la deuxième celle
+   
+     printf("Indiquer le num%cro de la ligne de la deuxi%cme cellule %c changer : ",130,138,133);
+    
+    //  fget permet de récupérer  la ligne de texte saisie par l'utilisateur et la stocker au niveau de la variable buffer
+    char buffer[BUFFER_SIZE];
+    fgets(buffer, BUFFER_SIZE, stdin);
+    
+    // Valider la valeur saisie par l'utilisateur  et la stocker au niveau de row2
+    // Il retourne true si la valeur est un entier et false si la valeur saisie ne correspond pas à un entier.
+    parsed_correct = parse_int(buffer, &row2);
+    
+    
+    // Contrôle spécifique à nombre de lsymboles qui doit être compris entre minSymbols (4 default) et maxSymbols (6 default)
+         
+    if   (parsed_correct && row2 >=1 && row2<=pGridLines) parsed_correct= true;
+    else parsed_correct=false;
+
+    if (!parsed_correct)  printf("%sLe num%cro de la lignee doit %ctre un entier entre 1 et %d%s\n",COLOR_RED,130,136,pGridLines,COLOR_RESET);
+        
+   // Après la saisie d'un nombre entier valide, on sort de la boucle
+
+  } while (!parsed_correct);
+
+  //  printf("Numero lige de la matrice : %d\n", row2);
+
+ 
+
+
+  first_time_around = 0;
+ 
+    do
+    {  
+         
+        if (first_time_around == 0)
+            first_time_around++;
+        else
+              printf("%sLa colone doit %ctre indiqu%ce par une lettre de A %c %c%s\n",COLOR_RED,136,130,133, letters[pGridColumns-1],COLOR_RESET);
+
+        printf("Indiquer le code de la colonne de la deuxi%cme cellule %c changer : ",138,133);
+
+    }  while (      (   ( scanf("%c%c", &letterCol2, &charEndLine) != 2 || charEndLine != '\n' )  && clean_stdin() )
+                          || !isalpha(letterCol2) 
+                          || ( isalpha(letterCol2) && ( toupper(letterCol2) <'A'  || toupper(letterCol2) > letters[pGridColumns-1] ) )
+                    );
+ col2=getNumCol(letterCol2);
+ 
+ //  printf("Numero colonne de la matrice : %c  %d\n", letterCol2,col2); 
+ 
+
 
 
 
         if (isValidMove(row1 - 1, col1 - 1, row2 - 1, col2 - 1))
          {                
               makeMove( row1 - 1, col1 - 1, row2 - 1, col2 - 1);
+
                
               printf("Matrice avec mouvement et avant suppression\n");
               printBoard();
